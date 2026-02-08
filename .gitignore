@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.log
+*.sqlite3
+
+# Virtual environments
+venv/
+.venv/
+
+# Node
+node_modules/
+dist/
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Vite
+.vite/
+
+# Cache
+.cache/

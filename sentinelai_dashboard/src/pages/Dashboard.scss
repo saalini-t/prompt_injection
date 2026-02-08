@@ -1,0 +1,41 @@
+.dashboard-page {
+  min-height: 100vh;
+  padding: 1.5rem;
+
+  .dashboard-title {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #161616;
+  }
+
+  .dashboard-tile {
+    height: 100%;
+    min-height: 400px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+
+    h4 {
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #161616;
+    }
+  }
+
+  .live-feed-tile {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+}
+
+/* Ensure proper grid spacing */
+.cds--grid {
+  margin-bottom: 1rem;
+}
+
+.cds--col {
+  padding: 0.5rem;
+}
+

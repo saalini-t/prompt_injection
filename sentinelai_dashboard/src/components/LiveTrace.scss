@@ -1,0 +1,69 @@
+.live-trace {
+  padding: 1.5rem;
+  height: 100%;
+
+  h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 0 0 1rem 0;
+    color: #525252;
+    font-size: 0.9rem;
+  }
+
+  .trace-list {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+  }
+
+  .trace-list::-webkit-scrollbar { width: 8px; }
+  .trace-list::-webkit-scrollbar-track { background: #f4f4f4; }
+  .trace-list::-webkit-scrollbar-thumb { background: #8d8d8d; border-radius: 4px; }
+
+  .trace-item {
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: #ffffff;
+  }
+
+  .trace-time {
+    font-size: 0.75rem;
+    color: #8d8d8d;
+    margin-bottom: 0.35rem;
+  }
+
+  .trace-body {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .trace-icon {
+    font-size: 1.1rem;
+  }
+
+  .trace-step {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .trace-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .empty {
+    text-align: center;
+    color: #8d8d8d;
+    padding: 1rem;
+    border: 1px dashed #e0e0e0;
+    border-radius: 6px;
+  }
+}

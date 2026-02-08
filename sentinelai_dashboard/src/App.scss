@@ -1,0 +1,19 @@
+.content-expanded {
+  margin-left: 256px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+.content-collapsed {
+  margin-left: 48px;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .content-expanded,
+  .content-collapsed {
+    margin-left: 0;
+    padding: 1rem;
+  }
+}
