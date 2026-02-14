@@ -7,15 +7,29 @@ from app.core.intent_engine import detect_hidden_intent
 from app.core.llm_guard import llm_reasoning_guard
 from app.utils.heatmap_generator import generate_text_heatmap, extract_trigger_words
 
-# Try to import vision pipeline (optional)
+# Try to import vision pipeline (optional) with timeout
+vision_available = False
+def analyze_image(file_bytes):
+    return {"deepfake_score": 0.0, "face_detected": False, "artifacts": {}}
+
 try:
-    from app.vision.vision_pipeline import analyze_image
+    import signal
+    
+    def timeout_handler(signum, frame):
+        raise TimeoutError("Vision import timeout")
+    
+    # Set a 3-second timeout for vision import
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(3)
+    
+    from app.vision.vision_pipeline import analyze_image as vision_analyze
+    analyze_image = vision_analyze
     vision_available = True
+    
+    signal.alarm(0)  # Cancel alarm
 except Exception as e:
-    print(f"[WARN] Vision pipeline unavailable: {e}")
+    print(f"[WARN] Vision pipeline unavailable: {type(e).__name__}: {str(e)[:100]}")
     vision_available = False
-    def analyze_image(file_bytes):
-        return {"deepfake_score": 0.0, "face_detected": False, "artifacts": {}}
 
 router = APIRouter()
 
