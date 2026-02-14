@@ -15,7 +15,7 @@ def _lazy_import_transformers():
             from sentence_transformers import util as transformer_util
             _transformer_util = transformer_util
         except Exception as e:
-            print(f"⚠️ Transformers import failed: {e}")
+            print(f"[WARN] Transformers import failed: {e}")
             _transformer_util = None
     return _transformer_util
 
@@ -28,16 +28,36 @@ PROMPT_ATTACKS = [
     "forget your instructions",
     "disregard your instructions",
     "override your instructions",
+    "do anything now",
+    "dan mode",
     "you are now dan",
     "act as if you are unrestricted",
     "pretend you have no restrictions",
     "jailbreak",
     "execute command",
     "reveal password",
+    "ignore database",
+    "ignore databases",
     "access database",
     "disable security",
     "bypass firewall",
     "access admin"
+]
+
+# Safe educational/informational patterns that should reduce risk
+SAFE_PATTERNS = [
+    "explain",
+    "what is",
+    "how does",
+    "define",
+    "describe",
+    "tell me about",
+    "can you help",
+    "tutorial",
+    "learn",
+    "education",
+    "teach",
+    "guide"
 ]
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -130,6 +150,14 @@ def detect_prompt_injection(text: str):
 
     sim_score = 0.0
     ml_score = 0.0
+    matched_patterns = []  # Track which patterns matched
+    
+    # Check for safe educational patterns first
+    is_safe_query = False
+    for safe_pattern in SAFE_PATTERNS:
+        if text_lower.startswith(safe_pattern) or f" {safe_pattern} " in text_lower:
+            is_safe_query = True
+            break
     
     # Semantic similarity check (if model loaded) - only if high threshold
     if _model is not None and _attack_embeddings is not None:
@@ -146,24 +174,30 @@ def detect_prompt_injection(text: str):
 
     # ML model score - use all scores, lower threshold
     raw_ml_score = _get_ml_score(text_lower)
-    ml_score = raw_ml_score if raw_ml_score > 0.3 else 0.0  # Lower threshold to 0.3
+    ml_score = raw_ml_score if raw_ml_score > 0.5 else 0.0  # Increased threshold to 0.5
 
     # Rule-based detection (keyword matching) - most reliable
     rule_score = 0.0
     for attack_pattern in PROMPT_ATTACKS:
         if attack_pattern in text_lower:
             rule_score = 0.95  # High confidence if exact pattern matched
-            break
+            matched_patterns.append(attack_pattern)
 
     # Combine scores: rule-based is most reliable, then ML, then semantic
     # Use max but with rule-based taking priority
     final = max(rule_score, ml_score, sim_score)
+    
+    # Apply dampening for safe educational queries
+    if is_safe_query and rule_score == 0.0:  # Only dampen if no explicit attack pattern
+        final = final * 0.5  # Reduce score by 50% for safe queries
 
     return {
         "malicious": final > 0.5,  # Threshold for flagging as malicious
         "confidence": round(final, 2),
         "similarity": round(sim_score, 2),
-        "ml_score": round(raw_ml_score, 2)  # Return raw ML score for debugging
+        "ml_score": round(raw_ml_score, 2),  # Return raw ML score for debugging
+        "triggers": matched_patterns,  # Which patterns matched
+        "is_safe_query": is_safe_query
     }
 
 

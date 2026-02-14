@@ -19,8 +19,10 @@ const LiveTrace = () => {
   const wsRef = useRef(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://127.0.0.1:8002/trace');
-    wsRef.value = ws;
+    const wsBase = import.meta.env.VITE_WS_BASE_URL
+      || `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`;
+    const ws = new WebSocket(`${wsBase}/trace`);
+    wsRef.current = ws;
 
     ws.onmessage = (event) => {
       try {

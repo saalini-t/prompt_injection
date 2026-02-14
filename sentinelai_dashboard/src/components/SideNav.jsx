@@ -9,7 +9,8 @@ import {
   Dashboard,
   SecurityServices,
   Report,
-  Activity
+  Activity,
+  Scan
 } from '@carbon/icons-react';
 
 const SideNav = ({ isExpanded, onToggle }) => {
@@ -18,6 +19,7 @@ const SideNav = ({ isExpanded, onToggle }) => {
 
   const navItems = [
     { path: '/', label: 'Dashboard', icon: Dashboard },
+    { path: '/scanner', label: 'Multimodal Scanner', icon: Scan },
     { path: '/attacks', label: 'Attack Logs', icon: SecurityServices },
     { path: '/policies', label: 'Policies', icon: Report },
     { path: '/health', label: 'System Health', icon: Activity }
@@ -29,7 +31,6 @@ const SideNav = ({ isExpanded, onToggle }) => {
       isFixedNav
       expanded={isExpanded}
       onOverlayClick={onToggle}
-      isPersistent={false}
     >
       <SideNavItems>
         {navItems.map((item) => (

@@ -1,11 +1,24 @@
+import os
 import redis
 import json
 
 try:
-    r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+    redis_host = os.getenv("REDIS_HOST", "localhost")
+    redis_port = int(os.getenv("REDIS_PORT", "6379"))
+    redis_password = os.getenv("REDIS_PASSWORD")
+    r = redis.Redis(
+        host=redis_host,
+        port=redis_port,
+        password=redis_password,
+        decode_responses=True,
+        socket_connect_timeout=2,
+        socket_keepalive=True,
+        health_check_interval=30
+    )
     r.ping()  # Test connection
+    print("[OK] Redis cache available")
 except Exception as e:
-    print(f"Redis connection failed: {e}")
+    print(f"[WARN] Redis connection failed: {e}")
     r = None
 
 def get_cached_policy(text: str):

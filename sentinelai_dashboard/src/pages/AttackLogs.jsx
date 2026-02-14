@@ -15,7 +15,7 @@ import {
   Pagination
 } from '@carbon/react';
 
-const AttackLogs = () => {
+const AttackLogs = ({ showTitle = true }) => {
   const [rows, setRows] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [page, setPage] = useState(1);
@@ -30,11 +30,14 @@ const AttackLogs = () => {
     return () => clearInterval(interval);
   }, [page, pageSize]);
 
+  const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+  const buildApiUrl = (path) => (apiBase ? `${apiBase}${path}` : path);
+
   const fetchLogs = async () => {
     try {
       setLoading(true);
       const skip = (page - 1) * pageSize;
-      const response = await fetch(`http://127.0.0.1:8002/api/v1/simulator/logs?limit=${pageSize}&skip=${skip}`);
+      const response = await fetch(buildApiUrl(`/api/v1/simulator/logs?limit=${pageSize}&skip=${skip}`));
       const data = await response.json();
       
       // Transform MongoDB data to table format
@@ -76,7 +79,9 @@ const AttackLogs = () => {
 
   return (
     <div>
-      <h2 style={{ marginBottom: '2rem' }}>Attack Logs {loading ? '(Loading...)' : ''}</h2>
+      {showTitle && (
+        <h2 style={{ marginBottom: '2rem' }}>Attack Logs {loading ? '(Loading...)' : ''}</h2>
+      )}
       <DataTable rows={rows} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <TableContainer>

@@ -56,6 +56,24 @@ DECEPTIVE_FRAMING = [
     "writing a story"
 ]
 
+# Safe educational/informational intents
+SAFE_PATTERNS = [
+    "explain",
+    "what is",
+    "how does",
+    "define",
+    "describe",
+    "tell me about",
+    "can you help",
+    "tutorial",
+    "learn about",
+    "education",
+    "teach me",
+    "guide me",
+    "information about",
+    "understand"
+]
+
 def extract_narrative_intent(text: str):
     """
     Detect hidden malicious intent in narratives and stories.
@@ -88,6 +106,13 @@ def extract_narrative_intent(text: str):
     
     text_lower = text.lower()
     
+    # Check for safe educational patterns
+    is_safe_query = False
+    for safe_pattern in SAFE_PATTERNS:
+        if text_lower.startswith(safe_pattern) or f" {safe_pattern}" in text_lower:
+            is_safe_query = True
+            break
+    
     # ML-based detection
     vec = vectorizer.transform([text])
     ml_score = narrative_model.predict_proba(vec)[0][1]  # Probability of malicious
@@ -115,6 +140,10 @@ def extract_narrative_intent(text: str):
     
     # Final confidence: weighted combination (give more weight to rules)
     final_confidence = max(ml_score, rule_score)  # Take worst score
+    
+    # Apply strong dampening for safe educational queries with no dangerous signals
+    if is_safe_query and len(dangerous_hits) == 0:
+        final_confidence = final_confidence * 0.3  # Reduce score by 70% for safe queries
     
     return {
         "malicious": final_confidence > 0.6,

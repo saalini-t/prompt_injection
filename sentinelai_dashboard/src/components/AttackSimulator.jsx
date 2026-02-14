@@ -31,7 +31,9 @@ const AttackSimulator = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post('http://127.0.0.1:8002/api/v1/detect/scan', {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || '';
+      const endpoint = apiBase ? `${apiBase}/api/v1/detect/scan` : '/api/v1/detect/scan';
+      const response = await axios.post(endpoint, {
         text: prompt
       });
       

@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.core.detector import hybrid_detect
 from app.core.policy_engine import evaluate_policy
 from app.core.prompt_sanitizer import sanitize_prompt
+from app.core.ethics_guardian import ethics_check
 
 # Optionally import logger - gracefully degrade if dependencies unavailable
 try:
@@ -20,14 +21,29 @@ try:
     _redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
     _redis_client.ping()
     redis_available = True
-    print("✅ Redis cache available")
+    print("[OK] Redis cache available")
 except Exception as e:
-    print(f"⚠️  Redis cache unavailable: {e}")
+    print(f"[WARN] Redis cache unavailable: {e}")
     redis_available = False
     def get_cached_policy(text): return None
     def set_cached_policy(text, result): pass
 
 router = APIRouter()
+
+
+def _convert_numpy_types(obj):
+    if isinstance(obj, dict):
+        return {k: _convert_numpy_types(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_convert_numpy_types(item) for item in obj]
+    if hasattr(obj, "item"):
+        try:
+            return obj.item()
+        except Exception:
+            return str(obj)
+    if isinstance(obj, (bool, int, float, str)) or obj is None:
+        return obj
+    return str(obj)
 
 @router.post("/scan")
 async def scan_prompt(payload: dict):
@@ -40,13 +56,18 @@ async def scan_prompt(payload: dict):
         if redis_available:
             cached = get_cached_policy(text)
             if cached:
-                print(f"✅ Cache HIT for: {text[:50]}...")
+                print(f"[OK] Cache HIT for: {text[:50]}...")
                 return {"cached": True, "result": json.loads(cached)}
             else:
-                print(f"❌ Cache MISS for: {text[:50]}...")
+                print(f"[MISS] Cache MISS for: {text[:50]}...")
 
         # Run 3-brain hybrid detection
-        hybrid_result = hybrid_detect(text)
+        hybrid_result = _convert_numpy_types(hybrid_detect(text))
+        ethics_result = ethics_check(text)
+
+        if ethics_result.get("ethical_risk"):
+            hybrid_result["decision"] = "block"
+            hybrid_result["risk"] = max(hybrid_result.get("risk", 0), ethics_result.get("score", 0.9))
         
         sanitized = None
         if hybrid_result["decision"] == "sanitize":
@@ -70,9 +91,12 @@ async def scan_prompt(payload: dict):
 
         result = {
             "hybrid_analysis": hybrid_result,
+            "ethics_analysis": ethics_result,
             "sanitized": sanitized,
             "timestamp": None  # Add timestamp if needed
         }
+
+        result = _convert_numpy_types(result)
 
         if redis_available:
             try:

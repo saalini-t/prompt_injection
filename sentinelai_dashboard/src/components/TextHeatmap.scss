@@ -1,0 +1,170 @@
+.text-heatmap {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 150, 255, 0.2);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+
+  .heatmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h4 {
+      margin: 0;
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .heatmap-legend {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+
+      .legend-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 3px;
+
+        &::before {
+          content: '';
+          width: 10px;
+          height: 10px;
+          border-radius: 2px;
+        }
+
+        &.critical::before {
+          background-color: #ff5050;
+        }
+
+        &.high::before {
+          background-color: #f1c21b;
+        }
+
+        &.medium::before {
+          background-color: #0096ff;
+        }
+
+        &.safe::before {
+          background-color: #42be65;
+        }
+      }
+    }
+  }
+
+  .heatmap-display {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 150, 255, 0.15);
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Courier New', monospace;
+    line-height: 1.8;
+    word-wrap: break-word;
+    color: #e0e0e0;
+
+    .heatmap-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+
+      .heatmap-segment {
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          transform: scale(1.05);
+          box-shadow: 0 0 8px rgba(0, 150, 255, 0.4);
+        }
+
+        &.heatmap-critical {
+          background-color: rgba(255, 80, 80, 0.3);
+          color: #ff5050;
+          font-weight: 600;
+          border-left: 3px solid #ff5050;
+        }
+
+        &.heatmap-high {
+          background-color: rgba(241, 194, 27, 0.2);
+          color: #f1c21b;
+          font-weight: 500;
+          border-left: 2px solid #f1c21b;
+        }
+
+        &.heatmap-medium {
+          background-color: rgba(0, 150, 255, 0.15);
+          color: #0096ff;
+          border-left: 2px solid #0096ff;
+        }
+
+        &.heatmap-safe {
+          background-color: transparent;
+          color: #e0e0e0;
+        }
+
+        &.heatmap-neutral {
+          background-color: transparent;
+          color: #a8a9ae;
+        }
+      }
+    }
+  }
+
+  .highlighted-terms {
+    margin-bottom: 1.5rem;
+
+    h5 {
+      font-size: 0.95rem;
+      color: #a8a9ae;
+      margin: 0 0 0.75rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .terms-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .trigger-tag {
+        background-color: rgba(255, 80, 80, 0.2);
+        color: #ff5050;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(255, 80, 80, 0.4);
+        font-weight: 500;
+      }
+    }
+  }
+
+  .risk-gauge {
+    .gauge-label {
+      font-size: 0.9rem;
+      color: #a8a9ae;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .gauge-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 150, 255, 0.2);
+
+      .gauge-fill {
+        height: 100%;
+        width: 0;
+        transition: width 0.3s ease;
+        border-radius: 4px;
+      }
+    }
+  }
+}

@@ -2,12 +2,16 @@
   margin-left: 256px;
   padding: 2rem;
   transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  display: block;
 }
 
 .content-collapsed {
   margin-left: 48px;
   padding: 2rem;
   transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  display: block;
 }
 
 @media (max-width: 768px) {

@@ -1,6 +1,10 @@
+import os
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://localhost:27017")
+mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+mongo_db_name = os.getenv("MONGO_DB", "sentinelai")
 
-db = client["sentinelai"]
+client = MongoClient(mongo_uri)
+
+db = client[mongo_db_name]
 attack_logs = db["attack_logs"]

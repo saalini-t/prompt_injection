@@ -8,8 +8,9 @@ const LiveFeed = () => {
   const wsRef = useRef(null);
 
   useEffect(() => {
-    // Connect to real WebSocket for attack events
-    const ws = new WebSocket('ws://127.0.0.1:8002/attacks');
+    const wsBase = import.meta.env.VITE_WS_BASE_URL
+      || `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`;
+    const ws = new WebSocket(`${wsBase}/attacks`);
     wsRef.current = ws;
 
     ws.onopen = () => {

@@ -22,10 +22,13 @@ async def broadcast(event):
 async def log_incident(event: dict):
     event["timestamp"] = int(time.time())
 
-    result = attack_logs.insert_one(event)
-
     kafka_event = event.copy()
-    kafka_event["_id"] = str(result.inserted_id)
+    try:
+        result = attack_logs.insert_one(event)
+        kafka_event["_id"] = str(result.inserted_id)
+    except Exception as e:
+        print(f"[WARN] MongoDB log failed: {e}")
+        kafka_event["_id"] = "unavailable"
 
     publish_attack(kafka_event)
 

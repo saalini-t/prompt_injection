@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Header,
   HeaderName,
   HeaderGlobalBar,
   HeaderGlobalAction,
-  Theme,
-  Content
+  Theme
 } from '@carbon/react';
 import {
   Notification,
@@ -13,16 +12,10 @@ import {
   Switcher
 } from '@carbon/icons-react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
-import AttackLogs from './pages/AttackLogs';
-import PolicyManager from './pages/PolicyManager';
-import SystemHealth from './pages/SystemHealth';
-import SideNav from './components/SideNav';
+import MultimodalScanner from './components/MultimodalScanner';
 import './App.scss';
 
 function App() {
-  const [isSideNavExpanded, setIsSideNavExpanded] = useState(true);
-
   return (
     <Theme theme="white">
       <Router>
@@ -43,19 +36,12 @@ function App() {
           </HeaderGlobalBar>
         </Header>
 
-        <SideNav 
-          isExpanded={isSideNavExpanded}
-          onToggle={() => setIsSideNavExpanded(!isSideNavExpanded)}
-        />
-
-        <Content className={isSideNavExpanded ? 'content-expanded' : 'content-collapsed'}>
+        <div className="content-expanded">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/attacks" element={<AttackLogs />} />
-            <Route path="/policies" element={<PolicyManager />} />
-            <Route path="/health" element={<SystemHealth />} />
+            <Route path="/" element={<MultimodalScanner />} />
+            <Route path="*" element={<MultimodalScanner />} />
           </Routes>
-        </Content>
+        </div>
       </Router>
     </Theme>
   );
