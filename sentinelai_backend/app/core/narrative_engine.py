@@ -6,9 +6,16 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(SCRIPT_DIR, "..", "ml", "narrative_model.pkl")
 VECTORIZER_PATH = os.path.join(SCRIPT_DIR, "..", "ml", "narrative_vectorizer.pkl")
 
-# Load models at module level
-narrative_model = joblib.load(MODEL_PATH)
-vectorizer = joblib.load(VECTORIZER_PATH)
+# Load models at module level with graceful fallback
+narrative_model = None
+vectorizer = None
+
+try:
+    narrative_model = joblib.load(MODEL_PATH)
+    vectorizer = joblib.load(VECTORIZER_PATH)
+    print("[LOAD] Narrative model loaded successfully")
+except Exception as e:
+    print(f"[FALLBACK] Narrative model not available: {type(e).__name__}. Using rule-based detection.")
 
 # Dangerous narrative patterns (rule-based layer)
 DANGEROUS_GOALS = [
@@ -113,9 +120,14 @@ def extract_narrative_intent(text: str):
             is_safe_query = True
             break
     
-    # ML-based detection
-    vec = vectorizer.transform([text])
-    ml_score = narrative_model.predict_proba(vec)[0][1]  # Probability of malicious
+    # ML-based detection (with fallback if model unavailable)
+    ml_score = 0.0
+    if vectorizer is not None and narrative_model is not None:
+        try:
+            vec = vectorizer.transform([text])
+            ml_score = narrative_model.predict_proba(vec)[0][1]  # Probability of malicious
+        except Exception as e:
+            ml_score = 0.0
     
     # Rule-based detection
     dangerous_hits = [g for g in DANGEROUS_GOALS if g in text_lower]
